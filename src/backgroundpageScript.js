@@ -43,7 +43,7 @@
 					var opennsfwlinks = (localStorage["opennsfwlinks"] == "true");
 					var openlinksdirectly = (localStorage["openlinksdirectly"] == "true");
 					var tabslimit = localStorage["tabslimit"];
-					
+
 					if(!opennsfwlinks && ((url[0].toLowerCase().indexOf("nsfw") != -1) || url[3])) {
 						openUrl(urls, index + 1, count, tabid);
 						return;
@@ -68,9 +68,9 @@
 							var isIReddIt = url[5] && (url[5].toLowerCase().indexOf("i.redd.it") != -1);
 							var isIReddituploads = url[5] && (url[5].toLowerCase().indexOf("i.reddituploads.com") != -1);
 
-							if(isIReddIt || isIReddituploads) {								
+							if(isIReddIt || isIReddituploads) {
 								url[1] = url[5];
-								
+
 								// add the original URL to the history
 								chrome.history.addUrl({
 									url : url[1]
@@ -83,18 +83,18 @@
 							index : index
 						});
 
-						chrome.tabs.create({
-							url : url[1],
-							selected : false
-						});
-
+						//if the option opencomments is true, open the comments instead of the links
 						if(opencomments) {
 							chrome.tabs.create({
 								url : url[2],
 								selected : false
 							});
+						}else{
+							chrome.tabs.create({
+								url : url[1],
+								selected : false
+							});
 						}
-
 						openUrl(urls, index + 1, count + 1, tabid);
 					});
 				}
@@ -193,7 +193,7 @@
 				});
 				checkVersion();
 			}
-			
+
 document.addEventListener('DOMContentLoaded', function () {
   init();
 });
