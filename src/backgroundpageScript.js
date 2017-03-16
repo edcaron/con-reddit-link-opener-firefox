@@ -113,10 +113,9 @@
 
 			function checkVersion() {
 
+				//migration of the 'opencomments' prop to 'openingComportment' on localStorage
 				function updateOpeningComportment(){
-					console.log("updating the 'openingComportment' prop on localStorage");
-
-					if(localStorage["openingComportment"] == "true"){
+					if(localStorage["opencomments"] == "true"){
 						localStorage["openingComportment"] = "comments";
 					}else{
 						localStorage["openingComportment"] = "articles";
@@ -147,7 +146,7 @@
 
 				// Check if the version has changed.
 				var currVersion = getVersion();
-				var prevVersion = localStorage['version']
+				var prevVersion = localStorage['version'];
 				if(currVersion != prevVersion) {
 					// Check if we just installed this extension.
 					if( typeof prevVersion == 'undefined') {
