@@ -23,6 +23,14 @@
 				});
 			}
 
+
+			function createTab(url, selected){
+				chrome.tabs.create({
+					url : url,
+					selected : selected
+				});
+			}
+
 			function openUrl(urls, index, count, tabid) {
 
 				if(index == urls.length) {
@@ -38,7 +46,7 @@
 
 				if(!url[1].match("javascript:.*")) {
 
-					var opencomments = (localStorage["opencomments"] == "true");
+					var openingComportment = localStorage["openingComportment"];
 					var openvisitedlinks = (localStorage["openvisitedlinks"] == "true");
 					var opennsfwlinks = (localStorage["opennsfwlinks"] == "true");
 					var openlinksdirectly = (localStorage["openlinksdirectly"] == "true");
@@ -83,24 +91,37 @@
 							index : index
 						});
 
-						//if the option opencomments is true, open the comments instead of the links
-						if(opencomments) {
-							chrome.tabs.create({
-								url : url[2],
-								selected : false
-							});
-						}else{
-							chrome.tabs.create({
-								url : url[1],
-								selected : false
-							});
+						switch(openingComportment) {
+						    case "comments":
+    							createTab(url[2], false);
+						        break;
+						    case "articles":
+								createTab(url[1], false);
+						        break;
+					        case "both":
+					        	createTab(url[1], false);
+								createTab(url[2], false);
+						        break;
+						    default:
+								createTab(url[1], false);
 						}
+
 						openUrl(urls, index + 1, count + 1, tabid);
 					});
 				}
 			}
 
 			function checkVersion() {
+
+				function updateOpeningComportment(){
+					console.log("updating the 'openingComportment' prop on localStorage");
+
+					if(localStorage["openingComportment"] == "true"){
+						localStorage["openingComportment"] = "comments";
+					}else{
+						localStorage["openingComportment"] = "articles";
+					}
+				}
 
 				function onInstall() {
 					chrome.tabs.create({
@@ -110,6 +131,9 @@
 				}
 
 				function onUpdate() {
+
+					updateOpeningComportment();
+
 					chrome.tabs.create({
 						url : "changelog.html",
 						selected : true
@@ -137,7 +161,7 @@
 
 			function init() {
 
-				var opencomments = localStorage["opencomments"];
+				var openingComportment = localStorage["openingComportment"];
 				var openvisitedlinks = localStorage["openvisitedlinks"];
 				var opennsfwlinks = localStorage["opennsfwlinks"];
 				var openlinksdirectly = localStorage["openlinksdirectly"];
@@ -146,8 +170,8 @@
 
 				localStorage["oldkeyboardshortcut"] = undefined;
 
-				if(!opencomments) {
-					localStorage["opencomments"] = "false";
+				if(!openingComportment) {
+					localStorage["openingComportment"] = "articles";
 				}
 
 				if(!openvisitedlinks) {
