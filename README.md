@@ -1,4 +1,4 @@
-# Reddit Link Opener
+# CON Reddit Link Opener
 
 This Extension will open all Links on the currently opened Reddit/Subreddit Page.
 
