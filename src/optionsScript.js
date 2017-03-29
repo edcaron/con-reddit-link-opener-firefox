@@ -23,7 +23,7 @@
 
 				localStorage["keyboardshortcut"] = input_keyboardshortcut.value;
 
-				var bg = chrome.extension.getBackgroundPage();
+				var bg = browser.extension.getBackgroundPage();
 
 				bg.updateSettings();
 

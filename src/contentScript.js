@@ -3,26 +3,26 @@ var jquery_set_comments;
 
 function fakeClick(obj) {
 	$(obj).closest('.thing').addClass('visited');
-	
+
 	var evObj = document.createEvent('MouseEvents');
 	evObj.initMouseEvent("mousedown", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 1, null);
-	
+
 	obj.dispatchEvent(evObj);
 }
 
 function isNSFW(url){
 	var nsfw_arr = $("#siteTable .even .nsfw-stamp, #siteTable .odd .nsfw-stamp");
-	
+
 	for (var i=0; i < nsfw_arr.length; i++) {
 	  if (url.parentNode.parentNode == nsfw_arr[i].parentNode.parentNode){
 	  	return true;
-	  }	  
+	  }
 	};
-	
+
 	return false;
 }
 
-chrome.extension.onRequest.addListener(function(request, sender, callback) {
+browser.runtime.onMessage.addListener(function(request, sender, callback) {
 	switch (request.action) {
 		case 'openRedditLinks':
 			jquery_set_links = $("#siteTable a.title:visible");
@@ -58,7 +58,7 @@ chrome.extension.onRequest.addListener(function(request, sender, callback) {
 				}
 
 				shortcut.add(request.keyboardshortcut, function() {
-					chrome.extension.sendRequest({
+					browser.runtime.sendMessage({
 						action : "keyboardShortcut"
 					});
 				});
@@ -70,6 +70,6 @@ chrome.extension.onRequest.addListener(function(request, sender, callback) {
 	}
 });
 
-chrome.extension.sendRequest({
+browser.runtime.sendMessage({
 	action : "initKeyboardShortcut"
 });

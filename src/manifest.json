@@ -1,33 +1,35 @@
 {
-   "manifest_version": 2,
-   
-   "name": "Reddit Link Opener",
-   "description": "This extension will open all links in tabs on Reddit and all Subreddits",
-   "icons": {
-      "128": "img/icon128.png"
-   },
-   "version": "1.6.0",
-   
-   "background": { 
-     "page": "background.html"
-   },
-   
-   "browser_action": {
-      "default_icon": "img/icon19.png",
-      "default_title": "Reddit Link Opener"
-   },
-   
-   "content_scripts": [ {
-      "js": [ "jquery-1.6.4.min.js", "shortcut.js", "contentScript.js"],
-      "matches": [ "http://www.reddit.com/*", "https://www.reddit.com/*" ],
-      "run_at": "document_start"
-   } ],
-   
-   "options_page": "options.html",
-   
-   "permissions": [
-     "tabs",
-     "history",
-     "unlimitedStorage"
-    ]   
+  "manifest_version": 2,
+
+  "name": "Reddit Link Opener",
+  "description": "This extension will open all links in tabs on Reddit and all Subreddits",
+  "icons": {
+    "128": "img/icon128.png"
+  },
+  "version": "1.6.0",
+
+  "options_ui": {
+    "page": "options.html"
+  },
+
+  "background" : {
+    "scripts" : ["backgroundpageScript.js"]
+  },
+
+  "browser_action": {
+    "default_icon": "img/icon19.png",
+    "default_title": "Reddit Link Opener"
+  },
+
+  "content_scripts": [ {
+    "js": [ "jquery-1.6.4.min.js", "shortcut.js", "contentScript.js"],
+    "matches": [ "http://www.reddit.com/*", "https://www.reddit.com/*" ],
+    "run_at": "document_start"
+  } ],
+
+  "permissions": [
+    "tabs",
+    "history",
+    "unlimitedStorage"
+  ]
 }

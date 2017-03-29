@@ -1,10 +1,10 @@
 			function updateSettings() {
-				chrome.windows.getCurrent(function(win) {
+				browser.windows.getCurrent(function(win) {
 					// get an array of the tabs in the window
-					chrome.tabs.getAllInWindow(win.id, function(tabs) {
+					browser.tabs.getAllInWindow(win.id, function(tabs) {
 						for(i in tabs)// loop over the tabs
 						{
-							chrome.tabs.sendRequest(tabs[i].id, {
+							 browser.tabs.sendMessage(tabs[i].id, {
 								action : 'updateSettings',
 								keyboardshortcut : localStorage["keyboardshortcut"],
 								oldkeyboardshortcut : localStorage["oldkeyboardshortcut"]
@@ -15,7 +15,7 @@
 			}
 
 			function openAllUrls(tab) {
-				chrome.tabs.sendRequest(tab.id, {
+				 browser.tabs.sendMessage(tab.id, {
 					action : 'openRedditLinks',
 					tabid : tab.id
 				}, function(response) {
@@ -24,10 +24,10 @@
 			}
 
 
-			function createTab(url, selected){
-				chrome.tabs.create({
+			function createTab(url, active){
+				browser.tabs.create({
 					url : url,
-					selected : selected
+					active : active
 				});
 			}
 
@@ -35,7 +35,7 @@
 
 				if(index == urls.length) {
 					if(count == 0) {
-						chrome.tabs.sendRequest(tabid, {
+						 browser.tabs.sendMessage(tabid, {
 							action : 'openNextPage'
 						});
 					}
@@ -63,7 +63,7 @@
 					}
 
 					var historyItemUrl = url[1];
-					chrome.history.getVisits({
+					browser.history.getVisits({
 						url : historyItemUrl
 					}, function(visitItems) {
 
@@ -80,13 +80,13 @@
 								url[1] = url[5];
 
 								// add the original URL to the history
-								chrome.history.addUrl({
+								browser.history.addUrl({
 									url : url[1]
 								});
 							}
 						}
 
-						chrome.tabs.sendRequest(tabid, {
+						 browser.tabs.sendMessage(tabid, {
 							action : "scrapeInfoCompanionBar",
 							index : index
 						});
@@ -123,9 +123,9 @@
 				}
 
 				function onInstall() {
-					chrome.tabs.create({
+					browser.tabs.create({
 						url : "options.html",
-						selected : true
+						active : true
 					});
 				}
 
@@ -133,14 +133,14 @@
 
 					updateOpeningComportment();
 
-					chrome.tabs.create({
+					browser.tabs.create({
 						url : "changelog.html",
-						selected : true
+						active : true
 					});
 				}
 
 				function getVersion() {
-					var details = chrome.app.getDetails();
+					var details = browser.app.getDetails();
 					return details.version;
 				}
 
@@ -193,18 +193,18 @@
 					localStorage["keyboardshortcut"] = "Ctrl+Shift+F";
 				}
 
-				chrome.browserAction.onClicked.addListener(function(tab) {
+				browser.browserAction.onClicked.addListener(function(tab) {
 					openAllUrls(tab);
 				});
 
-				chrome.extension.onRequest.addListener(function(request, sender, callback) {
+				browser.runtime.onMessage.addListener(function(request, sender, callback) {
 					switch (request.action) {
 						case 'keyboardShortcut':
 							openAllUrls(sender.tab);
 							break;
 
 						case 'initKeyboardShortcut':
-							chrome.tabs.sendRequest(sender.tab.id, {
+							 browser.tabs.sendMessage(sender.tab.id, {
 								action : 'updateSettings',
 								keyboardshortcut : localStorage["keyboardshortcut"]
 							});
