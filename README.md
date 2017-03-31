@@ -2,11 +2,11 @@
 
 This Extension will open all Links on the currently opened Reddit/Subreddit Page.
 
-![logo](src/img/icon128.png)
+![logo](img/icon128.png)
 
-## features
+## Features
 
-### open comments
+### Open Comments
 
 You can also open the comments in a seperate tab.
 
@@ -17,3 +17,12 @@ Decide yourself how many Links you want to open at once.
 ### Keyboard shortcut
 
 You are free to choose your own Keyboard shortcut to open up the Tabs
+
+## Contribuitions
+
+Feel free to help this projetct grow!
+
+This extension is based on the [nickrussler/Reddit-Link-Opener](https://github.com/nickrussler/Reddit-Link-Opener) projetct. 
+
+## Find on store
+Find the extension on Firefox Addons Store https://addons.mozilla.org/pt-BR/firefox/addon/con-reddit-link-opener/
