@@ -22,7 +22,7 @@ You are free to choose your own Keyboard shortcut to open up the Tabs
 
 Feel free to help this projetct grow!
 
-This extension is based on the [nickrussler/Reddit-Link-Opener](https://github.com/nickrussler/Reddit-Link-Opener) projetct. 
+This extension is based on the [nickrussler/Reddit-Link-Opener](https://github.com/nickrussler/Reddit-Link-Opener) projetct.
 
 ## Find on store
 Find the extension on Firefox Addons Store https://addons.mozilla.org/pt-BR/firefox/addon/con-reddit-link-opener/
