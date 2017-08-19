@@ -112,20 +112,16 @@ function checkVersion() {
 
 	function onUpdate() {
 
-		updateOpeningComportment();
-
 		browser.tabs.create({
 			url : "changelog.html",
 			active : true
 		});
 	}
 
+// return the number of installed version
 	function getVersion() {
-		//var details = browser.app.getDetails();
-		//return details.version;
-
-		//future implementation: automaticaly get the extension version from the manifest file
-		return '1.0';
+		var manifest = browser.runtime.getManifest();
+		return manifest.version;
 	}
 
 	// Check if the version has changed.
@@ -153,8 +149,9 @@ function init() {
 
 	localStorage["oldkeyboardshortcut"] = undefined;
 
+	// set default options
 	if(!openingComportment) {
-		localStorage["openingComportment"] = "articles";
+		localStorage["openingComportment"] = "comments";
 	}
 
 	if(!openvisitedlinks) {
@@ -174,7 +171,7 @@ function init() {
 	}
 
 	if(!keyboardshortcut) {
-		localStorage["keyboardshortcut"] = "Ctrl+Shift+F";
+		localStorage["keyboardshortcut"] = "Ctrl+Shift+f";
 	}
 
 	browser.browserAction.onClicked.addListener(function(tab) {
