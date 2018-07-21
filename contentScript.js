@@ -11,13 +11,11 @@ function fakeClick(obj) {
 }
 
 function isNSFW(url){
-	var nsfw_arr = $("#siteTable .even .nsfw-stamp, #siteTable .odd .nsfw-stamp");
-
-	for (var i=0; i < nsfw_arr.length; i++) {
-	  if (url.parentNode.parentNode == nsfw_arr[i].parentNode.parentNode){
-	  	return true;
-	  }
-	};
+	for (var i = url.parentNode.nextSibling.children.length - 1; i >= 0; i--) {
+		if (url.parentNode.nextSibling.children[i].innerHTML == 'nsfw'){
+			return true;
+		}
+	}
 
 	return false;
 }
@@ -25,14 +23,37 @@ function isNSFW(url){
 browser.runtime.onMessage.addListener(function(request, sender, callback) {
 	switch (request.action) {
 		case 'openRedditLinks':
-			jquery_set_links = $("#siteTable a.title:visible");
-			jquery_set_comments = $("#siteTable a.comments:visible");
+			var isNewRedditLayout = $("#siteTable").length === 0;
+
+			if (isNewRedditLayout) {
+				jquery_set_comments = $('.scrollerItem a[data-click-id="body"]:visible');
+
+				var jquery_set_links = Array();
+				for( var i = 0; i < jquery_set_comments.length; i++) {
+					//get the link to the article
+					var new_link = jquery_set_comments[i].parentNode.parentNode.children[2];
+
+					//element with the link to the article does not exists when the article is on reddit itself
+					if (typeof new_link === "undefined") {
+						new_link = jquery_set_comments[i];
+					}
+					jquery_set_links.push(new_link);
+				};
+
+			} else {
+				jquery_set_links = $("#siteTable a.title:visible");
+				jquery_set_comments = $("#siteTable a.comments:visible");
+			}
+
+			console.log('jquery_set_links', jquery_set_links, 'jquery_set_comments', jquery_set_comments);
 
 			var data = Array();
 
 			var i;
-			for( i = 0; i < jquery_set_links.length; i++) {
-				data.push(new Array(jquery_set_links[i].text, jquery_set_links[i].href, jquery_set_comments[i].href, isNSFW(jquery_set_links[i]), ($(jquery_set_links[i]).parents('.visited').length == 0), $(jquery_set_links[i]).closest('.thing').data('url')));
+			for( i = 0; i < jquery_set_comments.length; i++) {
+				var isLinkNSFW = isNSFW(jquery_set_comments[i]);
+
+				data.push(new Array(jquery_set_comments[i].text, jquery_set_links[i].href, jquery_set_comments[i].href, isLinkNSFW));
 			}
 
 			if(data.length > 0) {
@@ -41,10 +62,18 @@ browser.runtime.onMessage.addListener(function(request, sender, callback) {
 					tabid : request.tabid
 				});
 			}
+
 			break;
 
 		case 'openNextPage':
-			window.location = $('.nextprev a[rel~="next"]').attr("href");
+			var isNewRedditLayout = $("#siteTable").length === 0;
+
+			if (isNewRedditLayout) {
+				window.scrollTo(0, document.body.scrollHeight);
+			} else {
+				window.location = $('.nextprev a[rel~="next"]').attr("href");
+			}
+
 			break;
 
 		case 'scrapeInfoCompanionBar':
@@ -64,7 +93,6 @@ browser.runtime.onMessage.addListener(function(request, sender, callback) {
 				});
 			}
 			break;
-
 		default:
 			break;
 	}
