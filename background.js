@@ -1,12 +1,20 @@
 function openAllUrls(tab) {
-	 browser.tabs.sendMessage(tab.id, {
-		action : 'openRedditLinks',
-		tabid : tab.id
-	}, function(response) {
-		openUrl(response.urls, 0, 0, response.tabid);
-	});
+	if (tab.url.includes('reddit')){
+		 browser.tabs.sendMessage(tab.id, {
+			action : 'openRedditLinks',
+			tabid : tab.id
+		}, function(response) {
+			openUrl(response.urls, 0, 0, response.tabid);
+		});
+	}
+	else
+	{
+        browser.tabs.create({
+	        url : "errorPage.html",
+	        active : true
+		});
+	}
 }
-
 
 function createTab(url, active){
 	browser.tabs.create({
@@ -15,8 +23,7 @@ function createTab(url, active){
 	});
 }
 
-function openUrl(urls, index, count, tabid) {
-
+async function openUrl(urls, index, count, tabid) {
 	if(index == urls.length) {
 		if(count == 0) {
 			 browser.tabs.sendMessage(tabid, {
@@ -28,15 +35,20 @@ function openUrl(urls, index, count, tabid) {
 
 	var url = urls[index];
 
-	if(!url[1].match("javascript:.*")) {
+	var pageTitle   = url[0];
+	var commentsUrl = url[1];
+	var articleUrl  = url[2];
+	var isLinkNSFW  = url[3];
+
+	if(!commentsUrl.match("javascript:.*")) {
 
 		var openingComportment = localStorage["openingComportment"];
-		var openvisitedlinks = (localStorage["openvisitedlinks"] == "true");
-		var opennsfwlinks = (localStorage["opennsfwlinks"] == "true");
-		var openlinksdirectly = (localStorage["openlinksdirectly"] == "true");
-		var tabslimit = localStorage["tabslimit"];
+		var openvisitedlinks   = (localStorage["openvisitedlinks"] == "true");
+		var opennsfwlinks      = (localStorage["opennsfwlinks"] == "true");
+		var openlinksdirectly  = (localStorage["openlinksdirectly"] == "true");
+		var tabslimit          = localStorage["tabslimit"];
 
-		if(!opennsfwlinks && ((url[0].toLowerCase().indexOf("nsfw") != -1) || url[3])) {
+		if(!opennsfwlinks && ((pageTitle.toLowerCase().indexOf("nsfw") != -1) || isLinkNSFW)) {
 			openUrl(urls, index + 1, count, tabid);
 			return;
 		}
@@ -46,58 +58,66 @@ function openUrl(urls, index, count, tabid) {
 			return;
 		}
 
-		var historyItemUrl = url[1];
+		var historyItemUrl = commentsUrl;
 
-		browser.history.getVisits({
-			url : historyItemUrl
-		}, function(visitItems) {
-
-			if(!(openvisitedlinks || ((visitItems.length == 0) && url[4]))) {
-				openUrl(urls, index + 1, count, tabid);
-				return;
+		var isCommentsUrlvisited = false;
+		await browser.history.getVisits({
+			url : commentsUrl
+		}).then( (result) => {
+			if( result.length > 0){
+				isCommentsUrlvisited = true;
+			}else{
+				isCommentsUrlvisited = false;
 			}
-
-			if(openlinksdirectly) {
-				var isIReddIt = url[5] && (url[5].toLowerCase().indexOf("i.redd.it") != -1);
-				var isIReddituploads = url[5] && (url[5].toLowerCase().indexOf("i.reddituploads.com") != -1);
-
-				if(isIReddIt || isIReddituploads) {
-					url[1] = url[5];
-
-					// add the original URL to the history
-					browser.history.addUrl({
-						url : url[1]
-					});
-				}
-			}
-
-			browser.tabs.sendMessage(tabid, {
-				action : "scrapeInfoCompanionBar",
-				index : index
-			});
-
-			switch(openingComportment) {
-			    case "comments":
-					createTab(url[2], false);
-
-					// add the original URL to the history
-					browser.history.addUrl({
-						url : url[1]
-					});
-			        break;
-			    case "articles":
-					createTab(url[1], false);
-			        break;
-		        case "both":
-		        	createTab(url[1], false);
-					createTab(url[2], false);
-			        break;
-			    default:
-					createTab(url[1], false);
-			}
-
-			openUrl(urls, index + 1, count + 1, tabid);
 		});
+
+		var isArticleUrlvisited = false;
+		await browser.history.getVisits({
+			url : commentsUrl
+		}).then( (result) => {
+			if( result.length > 0){
+				isArticleUrlvisited = true;
+			}else{
+				isArticleUrlvisited = false;
+			}
+		});
+
+		browser.tabs.sendMessage(tabid, {
+			action : "scrapeInfoCompanionBar",
+			index : index
+		});
+
+		switch(openingComportment) {
+		    case "comments":
+				if(openvisitedlinks == false && isCommentsUrlvisited == true) {
+					openUrl(urls, index + 1, count, tabid);
+					return;
+				}
+
+				createTab(articleUrl, false);
+		        break;
+		    case "articles":
+				if(openvisitedlinks == false && isArticleUrlvisited == true) {
+					openUrl(urls, index + 1, count, tabid);
+					return;
+				}
+
+				createTab(commentsUrl, false);
+		        break;
+	        case "both":
+				if(openvisitedlinks == false && (isCommentsUrlvisited == true ||  isArticleUrlvisited == true )) {
+					openUrl(urls, index + 1, count, tabid);
+					return;
+				}
+
+	        	createTab(commentsUrl, false);
+				createTab(articleUrl, false);
+		        break;
+		    default:
+				createTab(commentsUrl, false);
+		}
+
+		openUrl(urls, index + 1, count + 1, tabid);
 	}
 }
 
