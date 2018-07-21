@@ -45,7 +45,6 @@ async function openUrl(urls, index, count, tabid) {
 		var openingComportment = localStorage["openingComportment"];
 		var openvisitedlinks   = (localStorage["openvisitedlinks"] == "true");
 		var opennsfwlinks      = (localStorage["opennsfwlinks"] == "true");
-		var openlinksdirectly  = (localStorage["openlinksdirectly"] == "true");
 		var tabslimit          = localStorage["tabslimit"];
 
 		if(!opennsfwlinks && ((pageTitle.toLowerCase().indexOf("nsfw") != -1) || isLinkNSFW)) {
@@ -163,7 +162,6 @@ function init() {
 	var openingComportment = localStorage["openingComportment"];
 	var openvisitedlinks = localStorage["openvisitedlinks"];
 	var opennsfwlinks = localStorage["opennsfwlinks"];
-	var openlinksdirectly = localStorage["openlinksdirectly"];
 	var tabslimit = localStorage["tabslimit"];
 	var keyboardshortcut = localStorage["keyboardshortcut"];
 
@@ -180,10 +178,6 @@ function init() {
 
 	if(!opennsfwlinks) {
 		localStorage["opennsfwlinks"] = "true";
-	}
-
-	if(!openlinksdirectly) {
-		localStorage["openlinksdirectly"] = "false";
 	}
 
 	if(!tabslimit) {

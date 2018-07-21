@@ -117,7 +117,6 @@ body {
     border-bottom:1px dotted #2A2A2A;
   }
 
-
   #footer {
     width: 738px;
     height:53px;
@@ -126,4 +125,9 @@ body {
     font-size:9px;
     color:#2A2A2A;
     padding-top:25px;
+  }
+
+  .con-radio{
+    margin-left: 4px;
+    margin-right: 3px;
   }
