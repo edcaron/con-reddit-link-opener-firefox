@@ -71,7 +71,7 @@ function clickHandler(e) {
 	setTimeout(save_options, 0);
 }
 
-document.querySelector("form").addEventListener("submit", save_options);
 document.addEventListener('DOMContentLoaded', function () {
+	document.querySelector('button').addEventListener('click', clickHandler);
 	restore_options();
 });
