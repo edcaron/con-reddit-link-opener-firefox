@@ -36,8 +36,8 @@ async function openUrl(urls, index, count, tabid) {
 	var url = urls[index];
 
 	var pageTitle   = url[0];
-	var commentsUrl = url[1];
-	var articleUrl  = url[2];
+	var articleUrl  = url[1];
+	var commentsUrl = url[2];
 	var isLinkNSFW  = url[3];
 
 	if(!commentsUrl.match("javascript:.*")) {
@@ -57,29 +57,20 @@ async function openUrl(urls, index, count, tabid) {
 			return;
 		}
 
-		var historyItemUrl = commentsUrl;
-
 		var isCommentsUrlvisited = false;
-		await browser.history.getVisits({
-			url : commentsUrl
-		}).then( (result) => {
-			if( result.length > 0){
-				isCommentsUrlvisited = true;
-			}else{
-				isCommentsUrlvisited = false;
-			}
-		});
 
-		var isArticleUrlvisited = false;
-		await browser.history.getVisits({
-			url : commentsUrl
-		}).then( (result) => {
-			if( result.length > 0){
-				isArticleUrlvisited = true;
-			}else{
-				isArticleUrlvisited = false;
-			}
-		});
+		//check on the browser history if the link is visited. Only when the config is set to not visit already open links
+		if(openvisitedlinks == false){
+			await browser.history.getVisits({
+				url : commentsUrl
+			}).then( (result) => {
+				if( result.length > 0){
+					isCommentsUrlvisited = true;
+				}else{
+					isCommentsUrlvisited = false;
+				}
+			});
+		}
 
 		browser.tabs.sendMessage(tabid, {
 			action : "scrapeInfoCompanionBar",
@@ -93,18 +84,23 @@ async function openUrl(urls, index, count, tabid) {
 					return;
 				}
 
-				createTab(articleUrl, false);
+				createTab(commentsUrl, false);
 		        break;
 		    case "articles":
-				if(openvisitedlinks == false && isArticleUrlvisited == true) {
+				if(openvisitedlinks == false && isCommentsUrlvisited == true) {
 					openUrl(urls, index + 1, count, tabid);
 					return;
 				}
 
-				createTab(commentsUrl, false);
+				// add the original URL to the history
+				browser.history.addUrl({
+					url : commentsUrl
+				});
+
+				createTab(articleUrl, false);
 		        break;
 	        case "both":
-				if(openvisitedlinks == false && (isCommentsUrlvisited == true ||  isArticleUrlvisited == true )) {
+				if(openvisitedlinks == false && isCommentsUrlvisited == true) {
 					openUrl(urls, index + 1, count, tabid);
 					return;
 				}
@@ -181,7 +177,7 @@ function init() {
 	}
 
 	if(!tabslimit) {
-		localStorage["tabslimit"] = 25;
+		localStorage["tabslimit"] = 10;
 	}
 
 	if(!keyboardshortcut) {
