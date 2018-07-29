@@ -26,33 +26,16 @@ browser.runtime.onMessage.addListener(function(request, sender, callback) {
 			var isNewRedditLayout = $("#siteTable").length === 0;
 
 			if (isNewRedditLayout) {
-				jquery_set_comments = $('.scrollerItem a[data-click-id="body"]:visible');
-
-				var jquery_set_links = Array();
-				for( var i = 0; i < jquery_set_comments.length; i++) {
-					//get the link to the article
-					var new_link = jquery_set_comments[i].parentNode.parentNode.children[2];
-
-					//element with the link to the article does not exists when the article is on reddit itself
-					if (typeof new_link === "undefined") {
-						new_link = jquery_set_comments[i];
-					}
-					jquery_set_links.push(new_link);
-				};
-
+				jquery_set_links = $('.scrollerItem a[data-click-id="body"]:visible');
+				jquery_set_comments = $('.scrollerItem a[data-click-id="comments"]:visible');
 			} else {
 				jquery_set_links = $("#siteTable a.title:visible");
 				jquery_set_comments = $("#siteTable a.comments:visible");
 			}
 
-			console.log('jquery_set_links', jquery_set_links, 'jquery_set_comments', jquery_set_comments);
-
 			var data = Array();
-
-			var i;
-			for( i = 0; i < jquery_set_comments.length; i++) {
-				var isLinkNSFW = isNSFW(jquery_set_comments[i]);
-
+			for( var i = 0; i < jquery_set_comments.length; i++) {
+				var isLinkNSFW = isNSFW(jquery_set_links[i]);
 				data.push(new Array(jquery_set_comments[i].text, jquery_set_links[i].href, jquery_set_comments[i].href, isLinkNSFW));
 			}
 
