@@ -92,9 +92,13 @@ async function openUrl(urls, index, count, tabid) {
 					return;
 				}
 
-				// add the original URL to the history
-				browser.history.addUrl({
-					url : commentsUrl
+				// if not private, add the original URL to the history
+				browser.windows.getCurrent().then((window_obj) => {
+					if(!window_obj.incognito){
+						browser.history.addUrl({
+							url : commentsUrl
+						});						
+					}
 				});
 
 				createTab(articleUrl, false);
